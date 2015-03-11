@@ -6,6 +6,7 @@ public class CharacterBeh : MonoBehaviour {
 	int moveDir = 0;
 	public float speed;
 	Vector2 playerVelocity;
+	Vector2 playerVelocityY;
 	float jumpHeight = 0.1f;
 	public float velocityY;
 	public bool Grounded;
@@ -37,6 +38,7 @@ public class CharacterBeh : MonoBehaviour {
 			moveDir = 0;
 		}
 
+		Climb ();
 		Jump ();
 		Walk ();
 	}
@@ -81,13 +83,39 @@ public class CharacterBeh : MonoBehaviour {
 
 		if (Physics2D.Raycast (Origin, -Vector2.up, 0.1f, groundLayer))
 			Grounded = true;
-		else 
+		else if (canClimb == true)
+			Grounded = true;
+		else
 			Grounded = false;
 	}
 
 	void Climb (){
 
+		if (canClimb == true) {
+
+			float PlayerGravity = 0f;
+			float vertical = Input.GetAxisRaw ("Vertical");
+			rigidbody2D.gravityScale = PlayerGravity;
+
+			if (vertical > 0) {
+
+				transform.Translate(new Vector3(0, ((1*speed/Time.deltaTime)/50), 0));
+			}
+			if (vertical < 0) {
+
+					transform.Translate(new Vector3(0, ((-1*speed/Time.deltaTime)/50), 0));
+			} else {
+				velocityY = 0f;
+				playerVelocityY = new Vector2 (playerVelocity.x, 0f);
+				rigidbody2D.velocity = playerVelocityY;
+			}
+		} else {
+
+			float PlayerGravity = 1f;
+			rigidbody2D.gravityScale = PlayerGravity;
+		}
 	}
+
 	void OnTriggerStay2D (Collider2D col){
 
 		canClimb = true;
